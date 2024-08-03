@@ -1,7 +1,5 @@
 const WebSocket = require('ws');
-
 const wsServer = new WebSocket.Server({ noServer: true });
-
 wsServer.on('connection', socket => {
     socket.on('message', message => {
         // Handle incoming message
@@ -15,10 +13,8 @@ wsServer.on('connection', socket => {
             }
         });
     });
-
     socket.on('close', () => {
         // Handle socket close
     });
 });
-
 module.exports = wsServer;

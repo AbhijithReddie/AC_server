@@ -6,7 +6,7 @@ const authController = require('../controllers/auth.controller');
 router.post('/login', authController.login);
 router.post('/signup', authController.signup);
 router.get('/profile', userController.getProfile);
-router.put('/profile', userController.updateProfile);
+router.post('/profile', userController.updateProfile);
 router.post('/interests', userController.addInterest);
 router.post('/interests', userController.getInterests);
 

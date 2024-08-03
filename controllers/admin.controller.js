@@ -10,9 +10,7 @@ exports.deleteUser = async (req, res) => {
 
 };
 
-exports.updateUser = async (req, res) => {
-    
-};
+
 
 exports.getPosts = async (req, res) => {
     
