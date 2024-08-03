@@ -4,10 +4,11 @@ const userRoutes = require('./routes/user.route');
 const adminRoutes = require('./routes/admin.route');
 const chatRoutes = require('./routes/chat.route');
 const wsServer = require('./socket');
-
+const cors=require('cors');
 const app = express();
 const server = http.createServer(app);
 
+app.use(cors());
 app.use(express.json());
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);

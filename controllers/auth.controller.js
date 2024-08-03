@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { userModel } = require('../models/user.model');
 const nodemailer = require('nodemailer');
+require('dotenv').config()
 
 exports.login = async (req, res) => {
     const { identifier, password, role } = req.body;
@@ -11,7 +12,7 @@ exports.login = async (req, res) => {
     }
 
     try {
-        let login;
+        let login=null;
         if (identifier.includes('@')) {
             login = await loginModel.findOne({ email: identifier, role: role });
         } else {
@@ -48,6 +49,43 @@ exports.login = async (req, res) => {
 
 exports.signup = async (req, res) => {
     // Signup logic here
+    try{
+        const {email,pass,username,mobile,role,rollNumber,companyCard}=req.body;
+        if(role==='student'){
+            const new_user=await userModel.create({
+                email:email,
+                password:pass,
+                username:username,
+                mobileNumber:mobile,
+                role:role,
+                rollNumber:rollNumber,
+                companyCard:companyCard,
+                interests:[],
+                chatChannels:[],
+                approved:true,
+            })
+            return res.status(200).json({message:'Sign In Successful',status:true});
+        }
+        else{
+            const new_prof=await userModel.create({
+                email:email,
+                password:pass,
+                username:username,
+                mobileNumber:mobile,
+                role:role,
+                rollNumber:rollNumber,
+                companyCard:companyCard,
+                interests:[],
+                chatChannels:[],
+                approved:false,
+            })
+            return res.status(200).json({message:'Sign In Successful',status:true});
+        }
+    }
+    catch(e){
+        console.log(e);
+        return res.status(404).json({message:'Sign In Unsuccessful',status:false});
+    }
 };
 
 exports.forgotPassword = async (req, res) => {
