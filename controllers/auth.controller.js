@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { userModel } = require('../models/user.model');
 const nodemailer = require('nodemailer');
-require('dotenv').config()
+require('dotenv').config();
 
 exports.login = async (req, res) => {
     const { identifier, password, role } = req.body;
@@ -12,7 +12,7 @@ exports.login = async (req, res) => {
     }
 
     try {
-        let login=null;
+        let login = null;
         if (identifier.includes('@')) {
             login = await loginModel.findOne({ email: identifier, role: role });
         } else {
@@ -48,43 +48,51 @@ exports.login = async (req, res) => {
 };
 
 exports.signup = async (req, res) => {
-    // Signup logic here
-    try{
-        const {email,pass,username,mobile,role,rollNumber,companyCard}=req.body;
-        if(role==='student'){
-            const new_user=await userModel.create({
-                email:email,
-                password:pass,
-                username:username,
-                mobileNumber:mobile,
-                role:role,
-                rollNumber:rollNumber,
-                companyCard:companyCard,
-                interests:[],
-                chatChannels:[],
-                approved:true,
-            })
-            return res.status(200).json({message:'Sign In Successful',status:true});
+    try {
+        const { email, pass, username, mobile, role, rollNumber, companyCard } = req.body;
+        const hashedPassword = await bcrypt.hash(pass, 10); // Hash the password before storing
+
+        let newUser;
+        if (role === 'student') {
+            newUser = await userModel.create({
+                email,
+                password: hashedPassword,
+                username,
+                mobileNumber: mobile,
+                role,
+                rollNumber,
+                companyCard,
+                interests: [],
+                chatChannels: [],
+                approved: true,
+            });
+
+            // Create login record for the new student
+            await loginModel.create({
+                email,
+                password: hashedPassword,
+                rollno: rollNumber,
+                role
+            });
+        } else {
+            newUser = await userModel.create({
+                email,
+                password: hashedPassword,
+                username,
+                mobileNumber: mobile,
+                role,
+                rollNumber,
+                companyCard,
+                interests: [],
+                chatChannels: [],
+                approved: false,
+            });
         }
-        else{
-            const new_prof=await userModel.create({
-                email:email,
-                password:pass,
-                username:username,
-                mobileNumber:mobile,
-                role:role,
-                rollNumber:rollNumber,
-                companyCard:companyCard,
-                interests:[],
-                chatChannels:[],
-                approved:false,
-            })
-            return res.status(200).json({message:'Sign In Successful',status:true});
-        }
-    }
-    catch(e){
+
+        return res.status(200).json({ message: 'Sign Up Successful', status: true, user: newUser });
+    } catch (e) {
         console.log(e);
-        return res.status(404).json({message:'Sign In Unsuccessful',status:false});
+        return res.status(404).json({ message: 'Sign Up Unsuccessful', status: false });
     }
 };
 
@@ -95,8 +103,8 @@ exports.forgotPassword = async (req, res) => {
             port: 587,
             secure: false,
             auth: {
-                user: 'medworlddummy@gmail.com',
-                pass: 'unuh bmxl pmec ybvh'
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             },
             tls: {
                 rejectUnauthorized: false
@@ -105,7 +113,7 @@ exports.forgotPassword = async (req, res) => {
 
         const otp = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
         const mailOptions = {
-            from: 'medworlddummy@gmail.com',
+            from: process.env.EMAIL_USER,
             to: req.body.email,
             subject: 'Request Regarding Reset Password',
             html: `<b>Hello, User this is your verification OTP: ${otp}, please do not share..!</b>`,

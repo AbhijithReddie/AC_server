@@ -1,10 +1,14 @@
 const WebSocket = require('ws');
 const wsServer = new WebSocket.Server({ noServer: true });
+
 wsServer.on('connection', socket => {
     socket.on('message', message => {
         // Handle incoming message
         const parsedMessage = JSON.parse(message);
         const { channelId, senderId, content } = parsedMessage;
+
+        // Assign the channelId to the socket
+        socket.channelId = channelId;
 
         // Broadcast the message to all clients in the same channel
         wsServer.clients.forEach(client => {
@@ -13,8 +17,10 @@ wsServer.on('connection', socket => {
             }
         });
     });
+
     socket.on('close', () => {
         // Handle socket close
     });
 });
+
 module.exports = wsServer;

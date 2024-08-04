@@ -7,8 +7,8 @@ router.post('/login', authController.login);
 router.post('/signup', authController.signup);
 router.get('/profile', userController.getProfile);
 router.post('/profile', userController.updateProfile);
-router.post('/interests', userController.addInterest);
-router.post('/interests', userController.getInterests);
+router.post('/interests/add', userController.addInterest);
+router.get('/interests', userController.getInterests);
 
 
 module.exports = router;
